@@ -21,7 +21,7 @@ const Footer = () => {
           {/* Left Section */}
           <div className="mb-8 md:mb-0 md:w-1/3">
             <h2 className="text-2xl font-bold mb-3">
-              Parth <span className="text-blue-600">Panchal</span>
+              Harshdipsinh <span className="text-blue-600">Gohil</span>
             </h2>
             <p className="text-gray-300 mb-4">
               Full Stack Developer specializing in modern web technologies and responsive design solutions.
@@ -60,11 +60,11 @@ const Footer = () => {
             <ul className="space-y-4 text-gray-300">
               <li className="flex items-center space-x-3">
                 <FaEnvelope className="text-blue-600" />
-                <span>ParthPanchal5447@gmail.com</span>
+                <span>harshdipsinhgohil260@gmail.com</span>
               </li>
               <li className="flex items-center space-x-3">
                 <FaPhone className="text-blue-600" />
-                <span>+91 6354033831</span>
+                <span>+91 8128****18</span>
               </li>
             </ul>
           </div>
