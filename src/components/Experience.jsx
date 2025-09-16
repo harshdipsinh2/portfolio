@@ -7,7 +7,7 @@ const Experience = () => {
       company: 'Hexadroit ',
       position: 'Full Stack Developer',
       duration: '2022 - Present',
-      description: 'Developed and maintained multiple web applications using React and Node.js. Led a team of 3 developers and implemented CI/CD pipelines.',
+      description: 'Developed Tailor Management System using React.js and .NET during training phase.',
       achievements: [
         'Improved application performance by 40%',
         'Mentored junior developers',

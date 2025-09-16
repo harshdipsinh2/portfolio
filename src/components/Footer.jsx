@@ -27,18 +27,18 @@ const Footer = () => {
               Full Stack Developer specializing in modern web technologies and responsive design solutions.
             </p>
             <div className="flex space-x-4">
-              <a href="https://github.com/username" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="bg-gray-800 p-2 rounded-full hover:bg-blue-600 transition-colors">
+              <a href="https://github.com/harshdipsinh2" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="bg-gray-800 p-2 rounded-full hover:bg-blue-600 transition-colors">
                 <FaGithub size={20} />
               </a>
-              <a href="https://linkedin.com/in/username" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="bg-gray-800 p-2 rounded-full hover:bg-blue-600 transition-colors">
+              <a href="https://www.linkedin.com/in/harshdipsinh-gohil-355aab288/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="bg-gray-800 p-2 rounded-full hover:bg-blue-600 transition-colors">
                 <FaLinkedin size={20} />
               </a>
-              <a href="https://twitter.com/username" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="bg-gray-800 p-2 rounded-full hover:bg-blue-600 transition-colors">
+              {/* <a href="https://twitter.com/username" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="bg-gray-800 p-2 rounded-full hover:bg-blue-600 transition-colors">
                 <FaTwitter size={20} />
               </a>
               <a href="https://instagram.com/username" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="bg-gray-800 p-2 rounded-full hover:bg-blue-600 transition-colors">
-                <FaInstagram size={20} />
-              </a>
+                <FaInstagram size={20} /> */}
+              {/* </a> */}
             </div>
           </div>
 
