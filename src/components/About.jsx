@@ -1,9 +1,12 @@
 import { motion } from 'framer-motion';
+import resumePDF from "../assets/Harshdipsinh_Gohil.pdf"; 
 
 const About = () => {
   const handleDownloadResume = () => {
-    // Placeholder for resume download
-    alert('Resume download functionality will be implemented');
+    const link = document.createElement("a");
+    link.href = resumePDF;
+    link.download = "Harshdipsinh_Gohil_Resume.pdf"; 
+    link.click();
   };
 
   return (

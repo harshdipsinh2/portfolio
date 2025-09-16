@@ -73,7 +73,7 @@ const Footer = () => {
         <hr className="my-8 border-gray-700" />
 
         <div className="flex justify-between items-center text-gray-400 text-sm">
-          <p>© {currentYear} Parth Panchal. All rights reserved.</p>
+          <p>© {currentYear} Harshdipsinh Gohil. All rights reserved.</p>
           <button
             onClick={scrollToTop}
             aria-label="Scroll to top"

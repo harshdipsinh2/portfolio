@@ -7,14 +7,14 @@ const Education = () => {
       degree: 'Master of Science in Information Technology',
       institution: 'Silver Oak University',
       duration: '2018 - 2022',
-      description: 'Graduated with honors. Specialized in web development and software engineering.',
+      // description: 'Graduated with honors. Specialized in web development and software engineering.',
     },
     {
       id: 2,
       degree: 'High School ',
       institution: 'Nalanda vidyalay',
-      duration: '2016 - 2018',
-      description: 'Completed high school with excellent grades in mathematics and computer science.',
+      // duration: '2016 - 2018',
+      description: 'Completed high school with excellent grades.',
     },
   ];
 

@@ -1,7 +1,10 @@
-import React, { useEffect, useRef } from 'react';
-import * as THREE from 'three';
-import { motion } from 'framer-motion';
-import { useTheme } from '../contexts/ThemeContext';
+import React, { useEffect, useRef } from "react";
+import * as THREE from "three";
+import { motion } from "framer-motion";
+import { useTheme } from "../contexts/ThemeContext";
+import profileImg from "../assets/1739445467399 (1).jpg"
+
+; // 👉 replace with your actual image path
 
 const Hero = () => {
   const mountRef = useRef(null);
@@ -111,7 +114,7 @@ const Hero = () => {
 
       spheres.forEach((sphere) => {
         sphere.position.add(sphere.userData.velocity);
-        ['x', 'y', 'z'].forEach((axis) => {
+        ["x", "y", "z"].forEach((axis) => {
           if (sphere.position[axis] > 25 || sphere.position[axis] < -25) {
             sphere.userData.velocity[axis] *= -1;
           }
@@ -146,11 +149,11 @@ const Hero = () => {
       }
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     // Cleanup
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
       renderer.dispose();
       if (currentMount) {
         currentMount.removeChild(renderer.domElement);
@@ -160,28 +163,51 @@ const Hero = () => {
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
-    if (element) element.scrollIntoView({ behavior: 'smooth' });
+    if (element) element.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex flex-col items-center justify-center bg-black transition-colors duration-300"
+      className="relative min-h-screen flex flex-col items-center justify-center transition-colors duration-300"
+      style={{
+        backgroundColor: "#000000",
+        backgroundImage: `
+          linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)
+        `,
+        backgroundSize: "40px 40px",
+      }}
     >
       {/* Background Canvas */}
       <div
         ref={mountRef}
         className="absolute top-0 left-0 w-full h-full -z-10"
-        style={{ pointerEvents: 'none' }}
+        style={{ pointerEvents: "none" }}
       />
 
       {/* Content */}
-      <div className="container mx-auto px-4 py-16 text-center relative z-10 flex-grow flex flex-col justify-center">
+      <div className="container mx-auto px-4 py-20 text-center relative z-10 flex-grow flex flex-col justify-center">
+        {/* Profile Image */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          className="flex justify-center mb-8"
+        >
+          <img
+            src={profileImg}
+            alt="Profile"
+            className="w-40 h-40 md:w-52 md:h-52 rounded-full border-4 border-blue-600 shadow-lg"
+          />
+        </motion.div>
+
+        {/* Text */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="max-w-4xl mx-auto"
+          className="max-w-4xl mx-auto mt-6"
         >
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
@@ -214,16 +240,10 @@ const Hero = () => {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
             <button
-              onClick={() => scrollToSection('projects')}
+              onClick={() => scrollToSection("projects")}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-300 shadow-lg hover:shadow-xl"
             >
               View My Work
-            </button>
-            <button
-              onClick={toggleTheme}
-              className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-300"
-            >
-              {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
             </button>
           </motion.div>
         </motion.div>
@@ -231,11 +251,11 @@ const Hero = () => {
         {/* Scroll Down Arrow */}
         <motion.div
           animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
           className="mt-auto mb-6"
         >
           <button
-            onClick={() => scrollToSection('about')}
+            onClick={() => scrollToSection("about")}
             aria-label="Scroll down"
             className="text-white text-3xl animate-bounce"
           >
