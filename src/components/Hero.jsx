@@ -1,268 +1,385 @@
-import React, { useEffect, useRef } from "react";
-import * as THREE from "three";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { useTheme } from "../contexts/ThemeContext";
-import profileImg from "../assets/1739445467399 (1).jpg"
-
-; // 👉 replace with your actual image path
+import * as THREE from "three";
+import { FaChevronDown } from "react-icons/fa";
+import profileImage from "../assets/image.png";
 
 const Hero = () => {
   const mountRef = useRef(null);
-  const { theme, toggleTheme } = useTheme();
+  const sceneRef = useRef(null);
+  const animationIdRef = useRef(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const currentMount = mountRef.current;
+    if (!mountRef.current) return;
 
     // Scene setup
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
-
-    // Camera setup
     const camera = new THREE.PerspectiveCamera(
       75,
-      currentMount.clientWidth / currentMount.clientHeight,
+      window.innerWidth / window.innerHeight,
       0.1,
       1000
     );
-    camera.position.z = 30;
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
-    // Renderer setup
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(currentMount.clientWidth, currentMount.clientHeight);
-    renderer.setClearColor(0x000000, 0); // transparent background
-    currentMount.appendChild(renderer.domElement);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    mountRef.current.appendChild(renderer.domElement);
 
-    // Create bouncing spheres
-    const spheres = [];
-    const sphereGeometry = new THREE.SphereGeometry(2, 16, 16);
-    const sphereMaterial = new THREE.MeshBasicMaterial({
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(50, 50, 50);
+    scene.add(directionalLight);
+
+    // Particles
+    const particlesGeometry = new THREE.BufferGeometry();
+    const particlesCount = 800;
+    const posArray = new Float32Array(particlesCount * 3);
+
+    for (let i = 0; i < particlesCount * 3; i++) {
+      posArray[i] = (Math.random() - 0.5) * 100;
+    }
+
+    particlesGeometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(posArray, 3)
+    );
+
+    const particlesMaterial = new THREE.PointsMaterial({
+      size: 0.05,
       color: 0x3b82f6,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.8,
     });
 
-    for (let i = 0; i < 30; i++) {
-      const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particlesMesh);
+
+    // Floating spheres
+    const spheres = [];
+    const sphereGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+
+    for (let i = 0; i < 15; i++) {
+      const material = new THREE.MeshLambertMaterial({
+        color: new THREE.Color().setHSL(Math.random(), 0.7, 0.6),
+        transparent: true,
+        opacity: 0.6,
+      });
+
+      const sphere = new THREE.Mesh(sphereGeometry, material);
       sphere.position.set(
-        (Math.random() - 0.5) * 50,
-        (Math.random() - 0.5) * 50,
-        (Math.random() - 0.5) * 50
+        (Math.random() - 0.5) * 20,
+        (Math.random() - 0.5) * 20,
+        (Math.random() - 0.5) * 20
       );
-      sphere.userData.velocity = new THREE.Vector3(
-        (Math.random() - 0.5) * 0.1,
-        (Math.random() - 0.5) * 0.1,
-        (Math.random() - 0.5) * 0.1
-      );
+
+      sphere.userData = {
+        originalPosition: sphere.position.clone(),
+        floatSpeed: 0.01 + Math.random() * 0.02,
+      };
+
       spheres.push(sphere);
       scene.add(sphere);
     }
 
-    // Create floating bubbles
-    const bubbles = [];
-    const bubbleGeometry = new THREE.SphereGeometry(1.5, 16, 16);
-    const bubbleMaterial = new THREE.MeshPhongMaterial({
-      color: 0x99ccff,
-      transparent: true,
-      opacity: 0.3,
-      shininess: 100,
-      specular: 0xffffff,
-    });
+    // Geometric shapes
+    const shapes = [];
+    const geometries = [
+      new THREE.BoxGeometry(0.5, 0.5, 0.5),
+      new THREE.ConeGeometry(0.3, 0.8, 8),
+      new THREE.CylinderGeometry(0.2, 0.2, 0.8, 8),
+    ];
 
-    for (let i = 0; i < 20; i++) {
-      const bubble = new THREE.Mesh(bubbleGeometry, bubbleMaterial);
-      bubble.position.set(
-        (Math.random() - 0.5) * 50,
-        (Math.random() - 0.5) * 50,
-        (Math.random() - 0.5) * 50
+    for (let i = 0; i < 8; i++) {
+      const geometry = geometries[Math.floor(Math.random() * geometries.length)];
+      const material = new THREE.MeshLambertMaterial({
+        color: new THREE.Color().setHSL(0.6, 0.8, 0.5),
+        transparent: true,
+        opacity: 0.4,
+        wireframe: Math.random() > 0.5,
+      });
+
+      const shape = new THREE.Mesh(geometry, material);
+      shape.position.set(
+        (Math.random() - 0.5) * 30,
+        (Math.random() - 0.5) * 30,
+        (Math.random() - 0.5) * 30
       );
-      bubble.userData.velocity = new THREE.Vector3(
-        0,
-        0.02 + Math.random() * 0.02,
-        0
-      );
-      bubbles.push(bubble);
-      scene.add(bubble);
+
+      shape.userData = {
+        rotationSpeed: {
+          x: (Math.random() - 0.5) * 0.02,
+          y: (Math.random() - 0.5) * 0.02,
+          z: (Math.random() - 0.5) * 0.02,
+        },
+      };
+
+      shapes.push(shape);
+      scene.add(shape);
     }
 
-    // Create twinkling stars
-    const stars = [];
-    const starGeometry = new THREE.SphereGeometry(0.2, 8, 8);
-    const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    camera.position.z = 15;
+    sceneRef.current = { scene, camera, renderer, particlesMesh, spheres, shapes };
 
-    for (let i = 0; i < 100; i++) {
-      const star = new THREE.Mesh(starGeometry, starMaterial.clone());
-      star.position.set(
-        (Math.random() - 0.5) * 100,
-        (Math.random() - 0.5) * 100,
-        (Math.random() - 0.5) * 100
-      );
-      star.material.transparent = true;
-      star.material.opacity = 0.8;
-      star.userData.twinkleSpeed = 0.01 + Math.random() * 0.02;
-      stars.push(star);
-      scene.add(star);
-    }
+    // Mouse interaction
+    const mouse = { x: 0, y: 0 };
 
-    // Add light for bubbles
-    const light = new THREE.PointLight(0xffffff, 1, 500);
-    light.position.set(10, 10, 25);
-    scene.add(light);
+    const handleMouseMove = (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
 
     // Animation loop
     const animate = () => {
-      requestAnimationFrame(animate);
+      animationIdRef.current = requestAnimationFrame(animate);
 
-      spheres.forEach((sphere) => {
-        sphere.position.add(sphere.userData.velocity);
-        ["x", "y", "z"].forEach((axis) => {
-          if (sphere.position[axis] > 25 || sphere.position[axis] < -25) {
-            sphere.userData.velocity[axis] *= -1;
-          }
-        });
+      const time = Date.now() * 0.001;
+
+      // Rotate particles
+      particlesMesh.rotation.x = time * 0.1;
+      particlesMesh.rotation.y = time * 0.05;
+
+      // Animate spheres
+      spheres.forEach((sphere, index) => {
+        const { originalPosition, floatSpeed } = sphere.userData;
+        sphere.position.y = originalPosition.y + Math.sin(time + index) * 2;
+        sphere.rotation.x += 0.01;
+        sphere.rotation.y += 0.01;
       });
 
-      bubbles.forEach((bubble) => {
-        bubble.position.add(bubble.userData.velocity);
-        if (bubble.position.y > 25) {
-          bubble.position.y = -25;
-          bubble.position.x = (Math.random() - 0.5) * 50;
-          bubble.position.z = (Math.random() - 0.5) * 50;
-        }
+      // Animate shapes
+      shapes.forEach((shape) => {
+        const { rotationSpeed } = shape.userData;
+        shape.rotation.x += rotationSpeed.x;
+        shape.rotation.y += rotationSpeed.y;
+        shape.rotation.z += rotationSpeed.z;
       });
 
-      stars.forEach((star) => {
-        star.material.opacity =
-          0.5 + 0.5 * Math.sin(Date.now() * star.userData.twinkleSpeed * 0.01);
-      });
+      // Camera follows mouse
+      camera.position.x += (mouse.x * 2 - camera.position.x) * 0.05;
+      camera.position.y += (mouse.y * 2 - camera.position.y) * 0.05;
+      camera.lookAt(scene.position);
 
       renderer.render(scene, camera);
     };
 
     animate();
+    setIsLoaded(true);
 
-    // Handle resize
+    // Resize handler
     const handleResize = () => {
-      if (currentMount) {
-        camera.aspect = currentMount.clientWidth / currentMount.clientHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(currentMount.clientWidth, currentMount.clientHeight);
-      }
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
     };
 
     window.addEventListener("resize", handleResize);
 
     // Cleanup
     return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("resize", handleResize);
-      renderer.dispose();
-      if (currentMount) {
-        currentMount.removeChild(renderer.domElement);
+
+      if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current);
       }
+
+      if (mountRef.current && renderer.domElement) {
+        mountRef.current.removeChild(renderer.domElement);
+      }
+
+      // Dispose of Three.js objects
+      scene.traverse((object) => {
+        if (object.geometry) object.geometry.dispose();
+        if (object.material) {
+          if (Array.isArray(object.material)) {
+            object.material.forEach((material) => material.dispose());
+          } else {
+            object.material.dispose();
+          }
+        }
+      });
+      renderer.dispose();
     };
   }, []);
 
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) element.scrollIntoView({ behavior: "smooth" });
+  const textVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.1,
+        duration: 0.8,
+        ease: "easeOut",
+      },
+    }),
   };
 
   return (
     <section
-      id="hero"
-      className="relative min-h-screen flex flex-col items-center justify-center transition-colors duration-300"
-      style={{
-        backgroundColor: "#000000",
-        backgroundImage: `
-          linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)
-        `,
-        backgroundSize: "40px 40px",
-      }}
+      id="home"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900"
     >
-      {/* Background Canvas */}
-      <div
-        ref={mountRef}
-        className="absolute top-0 left-0 w-full h-full -z-10"
-        style={{ pointerEvents: "none" }}
-      />
+      {/* Three.js Canvas */}
+      <div ref={mountRef} className="absolute inset-0 z-0" />
+
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black bg-opacity-20 z-10"></div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 py-20 text-center relative z-10 flex-grow flex flex-col justify-center">
-        {/* Profile Image */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          className="flex justify-center mb-8"
-        >
-          <img
-            src={profileImg}
-            alt="Profile"
-            className="w-40 h-40 md:w-52 md:h-52 rounded-full border-4 border-blue-600 shadow-lg"
-          />
-        </motion.div>
-
-        {/* Text */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="max-w-4xl mx-auto mt-6"
-        >
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-5xl md:text-7xl font-bold text-white mb-4"
-          >
-            Harshdipsinh Gohil
-          </motion.h1>
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-2xl md:text-3xl font-semibold text-blue-500 mb-6"
-          >
-            Full Stack Developer
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto"
-          >
-            I build scalable web applications with clean code & modern design
-          </motion.p>
+      <div className="relative z-20 text-center text-white px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left Side - Text Content */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            initial="hidden"
+            animate="visible"
+            className="space-y-8 text-left lg:text-left"
           >
-            <button
-              onClick={() => scrollToSection("projects")}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-300 shadow-lg hover:shadow-xl"
-            >
-              View My Work
-            </button>
-          </motion.div>
-        </motion.div>
+            <motion.div custom={0} variants={textVariants}>
+              <motion.p
+                className="text-lg md:text-xl text-blue-300 mb-4 font-medium tracking-wide"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 1 }}
+              >
+                Hello, I'm
+              </motion.p>
+            </motion.div>
 
-        {/* Scroll Down Arrow */}
+            <motion.h1
+              custom={1}
+              variants={textVariants}
+              className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6"
+            >
+              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                Harshdipsinh
+              </span>
+              <br />
+              <span className="text-white">Gohil</span>
+            </motion.h1>
+
+            <motion.div custom={2} variants={textVariants}>
+              <motion.p
+                className="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1, duration: 1 }}
+              >
+                Full Stack Developer & Creative Problem Solver
+                <br />
+                <span className="text-lg text-blue-300">
+                  Crafting exceptional digital experiences with modern technologies
+                </span>
+              </motion.p>
+            </motion.div>
+
+            <motion.div
+              custom={3}
+              variants={textVariants}
+              className="flex flex-col sm:flex-row gap-6 justify-start items-start"
+            >
+              <motion.button
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3)",
+                }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() =>
+                  document.getElementById("projects").scrollIntoView({
+                    behavior: "smooth",
+                  })
+                }
+                className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                View My Work
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() =>
+                  document.getElementById("contact").scrollIntoView({
+                    behavior: "smooth",
+                  })
+                }
+                className="px-8 py-4 border-2 border-white text-white font-semibold rounded-full hover:bg-white hover:text-gray-900 transition-all duration-300"
+              >
+                Get In Touch
+              </motion.button>
+            </motion.div>
+          </motion.div>
+
+          {/* Right Side - Profile Image */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="flex justify-center lg:justify-end"
+          >
+            <div className="relative">
+              {/* Animated Ring */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 rounded-full border-4 border-dashed border-blue-400/30"
+              ></motion.div>
+
+              {/* Profile Image Container */}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.3 }}
+                className="relative w-80 h-80 rounded-full overflow-hidden border-4 border-white/20 shadow-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-sm"
+              >
+                {/* Your Profile Image */}
+                <img
+                  src={profileImage}
+                  alt="Harshdipsinh Gohil"
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+
+              {/* Floating Elements */}
+              <motion.div
+                animate={{ y: [-10, 10, -10] }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="absolute -top-4 -right-4 w-8 h-8 bg-blue-500 rounded-full opacity-80"
+              ></motion.div>
+              <motion.div
+                animate={{ y: [10, -10, 10] }}
+                transition={{ duration: 4, repeat: Infinity }}
+                className="absolute -bottom-4 -left-4 w-6 h-6 bg-purple-500 rounded-full opacity-80"
+              ></motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Scroll Indicator */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2, duration: 1 }}
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20"
+      >
         <motion.div
           animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-          className="mt-auto mb-6"
+          transition={{ duration: 2, repeat: Infinity }}
+          className="text-white cursor-pointer"
+          onClick={() =>
+            document.getElementById("about").scrollIntoView({
+              behavior: "smooth",
+            })
+          }
         >
-          <button
-            onClick={() => scrollToSection("about")}
-            aria-label="Scroll down"
-            className="text-white text-3xl animate-bounce"
-          >
-            ↓
-          </button>
+          <FaChevronDown size={24} />
         </motion.div>
-      </div>
+      </motion.div>
     </section>
   );
 };
